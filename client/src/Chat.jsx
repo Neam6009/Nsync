@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import Avatar from './Avatar';
 import Logo from './Logo';
+import { UserContext, UserContextProvider } from './UserContext.jsx';
+
 
 const Chat = () => {
     const [ws,setWs] = useState(null);
     const [onlinePeople, setOnlinePeople] = useState({});
     const [selectedUser, setSelectedUser] = useState(null);
+    const data = useContext(UserContext);
+    const UserId = data.id;
 
     const showOnlinePeople = (peopleArray)=>{
        const people = {};
@@ -13,7 +17,7 @@ const Chat = () => {
             people[UserId] = username;
        } )
        setOnlinePeople(people);
-       console.log(people)
+    //    console.log(people)
     }
 
     const handleMessage = (e)=>{
@@ -30,13 +34,17 @@ const Chat = () => {
 
         wss.addEventListener('message',handleMessage );
     },[]);
+
+    const onlinePeopleExcludingUser = {...onlinePeople};
+    delete onlinePeopleExcludingUser[UserId];
+   
     
     return (
         <div className='flex h-screen p-10 shadow-2xl'>
             <div className='bg-customGray w-1/3 text-white rounded-l-lg pl-4 pt-4 mb-4'>
                 <Logo/>
-                {Object.keys(onlinePeople).map(uid => (
-                <div className= {(uid === selectedUser)? "bg-gray-50 bg-opacity-20 rounded-lg mr-4": "mr-4 "}>
+                {Object.keys(onlinePeopleExcludingUser).map(uid => (
+                <div key={uid} className= {(uid === selectedUser)? "bg-gray-50 bg-opacity-20 rounded-lg mr-4": "mr-4 "}>
                 <div key={uid} onClick={()=> setSelectedUser(uid)} className='border-gray-50 py-2 bg-gray-50 bg-opacity-5 cursor-pointer
                  flex gap-2 items-center hover:bg-gray-50 hover:bg-opacity-20  rounded-lg  transition duration-300 pl-2 mb-2'>
                     <Avatar username={onlinePeople[uid]} UserId={uid}/>
