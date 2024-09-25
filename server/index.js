@@ -6,6 +6,7 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const User = require('./models/User');
+const Message = require('./models/Message')
 const ws = require('ws');
 const cookieParser = require('cookie-parser');
 
@@ -112,6 +113,20 @@ wss.on('connection',(connection,req)=>{
         }
     }
 
+    connection.on('message',async (message)=>{
+        const msgData = JSON.parse(message.toString());
+        const {recipient,text} = msgData;
+        if(recipient && text){
+            const MsgDoc = await Message.create({sender: connection.UserId,
+                recipient,
+                text
+            });
+            [...wss.clients].filter(c => c.UserId === recipient).forEach(c=>c.send(JSON.stringify({text,sender:connection.UserId,
+                id:MsgDoc._id
+            })));
+        }
+    });
+    
     [...wss.clients].forEach(client => {
         client.send(JSON.stringify(
             {
