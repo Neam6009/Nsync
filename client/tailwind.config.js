@@ -8,6 +8,9 @@ export default {
     extend: {
       colors:{
         customGray: "#2c2c2c"
+      },
+      fontFamily:{
+        "Waterfall": ["Waterfall", "cursive"] 
       }
     },
   },
