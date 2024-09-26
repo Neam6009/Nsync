@@ -40,8 +40,9 @@ const Chat = () => {
         if ('online' in msgData) {
             showOnlinePeople(msgData.online);
         } else if ('text' in msgData) {
-
-            setMessages(prev => ([...prev, { ...msgData }]))
+            if(msgData.sender === selectedUser){
+                setMessages(prev => ([...prev, { ...msgData }]))
+            }
         }
     }
 
